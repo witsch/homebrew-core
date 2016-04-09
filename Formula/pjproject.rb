@@ -11,7 +11,10 @@ class Pjproject < Formula
     sha256 "ebe8c9879332a77a90523f4791c70c109f57ffcecc176e77e2acdcb47bacaa3d" => :mountain_lion
   end
 
+  option "with-python", "Build with Python wrapper for PJSUA API"
+
   depends_on "openssl"
+  depends_on :python => :optional
 
   def install
     system "./configure", "--prefix=#{prefix}"
@@ -19,6 +22,13 @@ class Pjproject < Formula
     system "make"
     system "make", "install"
     bin.install "pjsip-apps/bin/pjsua-#{`uname -m`.chomp}-apple-darwin#{`uname -r`.chomp}" => "pjsua"
+
+    if build.with? "python"
+      cd "pjsip-apps/src/python" do
+        system "make"
+        system "python", "setup.py", "install", "--prefix=#{libexec}"
+      end
+    end
   end
 
   test do
